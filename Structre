@@ -1,0 +1,25 @@
+energy-data-engineering-BayWa/
+│
+├── README.md               
+├── requirements.txt        # Python dependencies
+│
+├── src/                    # All code here
+│   ├── main.py             # Entry point (run this)
+│   │
+│   ├── ingest/
+│   │   └── ingest_energy_charts.py
+│   │
+│   ├── transform/
+│   │   ├── bronze_to_silver.py
+│   │   └── silver_to_gold.py
+│   │
+│   └── utils/
+│       └── spark_session.py
+│
+├── data/                   # Local storage (generated)
+│   ├── bronze/
+│   ├── silver/
+│   └── gold/
+│
+└── diagrams/
+    └── architecture.png   
