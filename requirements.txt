@@ -1,4 +1,7 @@
+python-dateutil
 pyspark==3.5.1
 delta-spark==3.1.0
-requests
-python-dateutil
+python-dotenv==1.0.1
+pydantic==2.7.4
+requests==2.32.3
+
