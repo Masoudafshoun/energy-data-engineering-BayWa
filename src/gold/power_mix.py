@@ -1,28 +1,23 @@
 from __future__ import annotations
-
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
 
-
-def build_gold_power_mix_hourly(spark: SparkSession, silver_power_path: str) -> DataFrame:
+def build_gold_power_mix_daily(spark: SparkSession, silver_power_path: str) -> DataFrame:
+    # Load the Silver table where the column is named 'day'
     df = spark.read.format("delta").load(silver_power_path)
-
-    # Make hourly bucket
-    df = df.withColumn("hour_ts", F.date_trunc("hour", F.col("timestamp_utc")))
-    df = df.withColumn("date", F.to_date("hour_ts"))
-
-    out = (
-        df.groupBy("date", "hour_ts", "country", "production_type")
-        .agg(F.avg("value").alias("avg_mw"))
-        .orderBy("hour_ts", "production_type")
+    
+    # Use 'day' for the grouping and alias it to 'date' for the Gold layer
+    return (
+        df.groupBy(F.col("day").alias("date"), "country", "production_type")
+        .agg(F.sum("value").alias("daily_total_mwh"))
+        .orderBy("date", "production_type")
     )
-    return out
 
-
-def write_gold_power_mix_hourly(df: DataFrame, gold_path: str) -> None:
+def write_gold_power_mix_daily(df: DataFrame, gold_path: str) -> None:
     (
         df.write.format("delta")
         .mode("overwrite")
+        .option("overwriteSchema", "true") # Handle schema changes safely
         .partitionBy("date")
         .save(gold_path)
     )

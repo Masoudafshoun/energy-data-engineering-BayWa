@@ -6,8 +6,8 @@ import sys
 
 STEPS = [
     # Bronze (adjust names if yours differ)
-    ["python", "-m", "src.bronze.run_phase1_1_public_power"],
-    ["python", "-m", "src.bronze.run_phase1_2_prices"],
+    ["python", "-m", "src.ingestion.ingest.run_phase1_1"],
+    ["python", "-m", "src.ingestion.run_phase1_2"],
 
     # Silver
     ["python", "-m", "src.silver.run_phase2_2_public_power"],

@@ -13,24 +13,41 @@ def main() -> None:
     s = Settings.from_env()
     spark = get_spark_session("quality-checks")
 
+    # Load the updated Gold tables
     gold_daily = spark.read.format("delta").load(f"{s.data_root}/gold/prices_daily")
-    gold_mix = spark.read.format("delta").load(f"{s.data_root}/gold/power_mix_hourly")
-    gold_join = spark.read.format("delta").load(f"{s.data_root}/gold/price_vs_renewables_hourly")
+    gold_mix = spark.read.format("delta").load(f"{s.data_root}/gold/power_mix_daily")
+    gold_corr = spark.read.format("delta").load(f"{s.data_root}/gold/price_vs_offshore_daily")
 
-    # --- prices_daily
+    # --- 1. gold.prices_daily (Daily Price KPIs)
+    # Updated to check for 'avg_price_eur_mwh' per your new schema
     assert_row_count_min(gold_daily, 1, "gold.prices_daily")
-    assert_no_nulls(gold_daily, ["date", "bidding_zone", "avg_price"], "gold.prices_daily")
+    assert_no_nulls(
+        gold_daily, 
+        ["date", "bidding_zone", "avg_price_eur_mwh"], 
+        "gold.prices_daily"
+    )
 
-    # --- power_mix_hourly
-    assert_row_count_min(gold_mix, 1, "gold.power_mix_hourly")
-    assert_no_nulls(gold_mix, ["date", "hour_ts", "country", "production_type", "avg_mw"], "gold.power_mix_hourly")
+    # --- 2. gold.power_mix_daily (Trend of Daily Production)
+    # Updated path and columns to match Daily grain and 'daily_total_mwh'
+    assert_row_count_min(gold_mix, 1, "gold.power_mix_daily")
+    assert_no_nulls(
+        gold_mix, 
+        ["date", "country", "production_type", "daily_total_mwh"], 
+        "gold.power_mix_daily"
+    )
 
-    # --- price_vs_renewables_hourly
-    assert_row_count_min(gold_join, 1, "gold.price_vs_renewables_hourly")
-    assert_no_nulls(gold_join, ["date", "hour_ts", "bidding_zone", "avg_price_hourly"], "gold.price_vs_renewables_hourly")
-    assert_non_negative(gold_join, "load_mw", "gold.price_vs_renewables_hourly")
+    # --- 3. gold.price_vs_offshore_daily (Correlation Analysis)
+    # Updated to check 'offshore_wind_mwh' and daily average price
+    assert_row_count_min(gold_corr, 1, "gold.price_vs_offshore_daily")
+    assert_no_nulls(
+        gold_corr, 
+        ["date", "avg_price_eur_mwh", "offshore_wind_mwh"], 
+        "gold.price_vs_offshore_daily"
+    )
+    # Ensure production is not negative for offshore wind correlation
+    assert_non_negative(gold_corr, "offshore_wind_mwh", "gold.price_vs_offshore_daily")
 
-    print("✅ All quality checks passed.")
+    print("✅ All daily Gold layer quality checks passed.")
     spark.stop()
 
 

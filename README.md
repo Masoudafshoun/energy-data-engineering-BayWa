@@ -4,5 +4,11 @@ This project implements a PySpark-based data pipeline that ingests public energy
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env
 python -m src.pipeline.run_all
+
+
+#to_reset : 
+rm -rf data/bronze/public_power
+rm -rf data/bronze/prices
+rm -rf data/silver
+rm -rf data/gold
