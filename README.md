@@ -8,7 +8,6 @@ python -m src.pipeline.run_all
 
 
 #to_reset : 
-rm -rf data/bronze/public_power
-rm -rf data/bronze/prices
+rm -rf data/bronze
 rm -rf data/silver
 rm -rf data/gold
