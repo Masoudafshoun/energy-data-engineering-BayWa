@@ -1,21 +1,21 @@
-python-dateutil
+# Core & Utilities
+python-dateutil>=2.9.0
+python-dotenv>=1.0.0
+requests>=2.32.0
+pydantic>=2.7.0
+
+# Spark & Delta Lake
 pyspark==3.5.1
 delta-spark==3.1.0
-python-dotenv==1.0.1
-pydantic==2.7.4
-requests==2.32.3
+deltalake>=1.0.0
 
-# Data Processing & Storage
-pyspark>=3.5.0
-delta-spark>=3.0.0
-deltalake>=0.15.0
-
-# Visualization & Analysis
+# Data Processing & Analysis
 pandas>=2.0.0
+numpy>=2.0.0
+
+# Visualization
 matplotlib>=3.8.0
 seaborn>=0.13.0
 
-# System & Compatibility
+# System
 setuptools>=68.0.0
-requests>=2.31.0
-python-dotenv>=1.0.0
